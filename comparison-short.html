@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoom to Microsoft Teams Migration — Quick Reference</title>
+<style>
+  :root {
+    --green: #d4edda;
+    --green-text: #155724;
+    --yellow: #fff3cd;
+    --yellow-text: #856404;
+    --red: #f8d7da;
+    --red-text: #721c24;
+    --header-bg: #1a1a2e;
+    --header-text: #fff;
+    --nav-bg: #16213e;
+    --border: #dee2e6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #333;
+    background: #fff;
+    line-height: 1.4;
+  }
+
+  header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: 1.5rem 2rem 0.8rem;
+    text-align: center;
+  }
+  header h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.2rem; }
+  header p { font-size: 0.9rem; opacity: 0.8; }
+  header .version-link {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #8ab4f8;
+    text-decoration: none;
+    font-size: 0.85rem;
+    border: 1px solid rgba(138,180,248,0.4);
+    padding: 0.25rem 0.8rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  header .version-link:hover { background: rgba(138,180,248,0.15); }
+
+  nav {
+    background: var(--nav-bg);
+    padding: 0.6rem 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.3rem 1rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  nav a:hover { background: rgba(255,255,255,0.15); }
+
+  .legend {
+    max-width: 700px;
+    margin: 1rem auto 0;
+    padding: 0.5rem 1rem;
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.8rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.35rem; }
+  .legend-swatch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px; height: 22px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  section {
+    max-width: 850px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+  section h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.7rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 3px solid var(--nav-bg);
+    scroll-margin-top: 50px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    font-size: 0.82rem;
+  }
+  thead th {
+    background: var(--nav-bg);
+    color: #fff;
+    padding: 0.5rem 0.6rem;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 40px;
+    z-index: 10;
+  }
+  thead th:first-child { width: 35%; }
+  thead th:nth-child(2),
+  thead th:nth-child(3) { width: 7%; text-align: center; }
+  thead th:nth-child(4) { width: 51%; }
+
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:nth-child(even) { background: #f5f7fa; }
+  tbody tr:hover { background: #e9ecf0; }
+
+  td { padding: 0.35rem 0.6rem; vertical-align: middle; }
+  td:first-child { font-weight: 600; color: #1a1a2e; }
+
+  td.v, td.p, td.x {
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  td.v { background: var(--green); color: var(--green-text); }
+  td.p { background: var(--yellow); color: var(--yellow-text); }
+  td.x { background: var(--red); color: var(--red-text); }
+
+  td.note { font-size: 0.78rem; color: #555; }
+
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.75rem;
+    color: #888;
+    border-top: 1px solid var(--border);
+    margin-top: 1.5rem;
+  }
+
+  @media print {
+    nav { position: static; box-shadow: none; }
+    thead th { position: static; }
+    tbody tr:hover { background: inherit; }
+    section { page-break-inside: avoid; }
+    header, nav { background: #333 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    td.v, td.p, td.x { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  @media (max-width: 768px) {
+    table { font-size: 0.75rem; }
+    td, thead th { padding: 0.3rem 0.4rem; }
+    nav { gap: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Zoom &rarr; Microsoft Teams — Quick Reference</h1>
+  <p>Feature Availability at a Glance — Rooms &bull; Meetings &bull; Phone</p>
+  <a href="comparison.html" class="version-link">&larr; See Detailed Version</a>
+</header>
+
+<nav>
+  <a href="#rooms">Rooms</a>
+  <a href="#meetings">Meetings</a>
+  <a href="#phone">Phone</a>
+</nav>
+
+<div class="legend">
+  <div class="legend-item"><span class="legend-swatch" style="background:var(--green);color:var(--green-text)">V</span> Available</div>
+  <div class="legend-item"><span class="legend-swatch" style="background:var(--yellow);color:var(--yellow-text)">~</span> Partial / caveats</div>
+  <div class="legend-item"><span class="legend-swatch" style="background:var(--red);color:var(--red-text)">X</span> Not available</div>
+</div>
+
+<!-- ============================================== -->
+<!-- SECTION 1: ROOMS                               -->
+<!-- ============================================== -->
+<section>
+  <h2 id="rooms">1. Rooms</h2>
+  <table>
+    <thead>
+      <tr><th>Topic</th><th>Zoom</th><th>Teams</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Dial-in / Dial-out</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Proximity Join / Sharing</td><td class="v">V</td><td class="v">V</td><td class="note">Teams adds ultrasound (room-scoped)</td></tr>
+      <tr><td>Wireless Content Sharing</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>HDMI Content Sharing</td><td class="p">~</td><td class="p">~</td><td class="note">Zoom: blocked during Teams interop; Teams: no HDCP</td></tr>
+      <tr><td>Dual Screen Support</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Triple Screen Support</td><td class="v">V</td><td class="x">X</td><td class="note">Teams: not officially supported</td></tr>
+      <tr><td>Touch Panel Controller</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Room Booking / Scheduling Display</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom adds Google Cal; Teams: Outlook/Teams only</td></tr>
+      <tr><td>Whiteboarding in Room</td><td class="v">V</td><td class="p">~</td><td class="note">Teams: requires touch display for inking + OneDrive to save</td></tr>
+      <tr><td>Direct Guest Join (cross-platform)</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Interoperability (CVI / SIP / H.323)</td><td class="v">V</td><td class="p">~</td><td class="note">Teams: CVI via 3rd-party only; no native SIP/H.323</td></tr>
+      <tr><td>Room Analytics &amp; Monitoring</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Peripheral Management</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Device Ecosystem (OS)</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom: Win/Mac/Android; Teams: Win/Android only</td></tr>
+      <tr><td>BYOD Mode</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom: wireless (AirPlay/Miracast); Teams: USB-C cable only</td></tr>
+      <tr><td>Digital Signage</td><td class="v">V</td><td class="v">V</td><td class="note">Teams: rolling out Apr 2026</td></tr>
+      <tr><td>Companion Mode / Casting</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>AI: Smart Framing</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom: on-device; Teams: cloud-based</td></tr>
+      <tr><td>AI: Speaker Recognition</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>AI: Noise Suppression</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Recording from Room</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom: cloud + local; Teams: cloud only</td></tr>
+      <tr><td>Live Transcription / Captions</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Lobby / Waiting Room from Controller</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Layout Controls</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Kiosk / Reception Mode</td><td class="v">V</td><td class="x">X</td><td class="note">Teams: no equivalent</td></tr>
+      <tr><td>Hot Desking Integration</td><td class="v">V</td><td class="p">~</td><td class="note">Zoom: AI suggestions + floor maps; Teams: basic</td></tr>
+      <tr><td>Occupancy Sensing</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================== -->
+<!-- SECTION 2: MEETINGS                            -->
+<!-- ============================================== -->
+<section>
+  <h2 id="meetings">2. Meetings</h2>
+  <table>
+    <thead>
+      <tr><th>Topic</th><th>Zoom</th><th>Teams</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Simultaneous Content Sharing</td><td class="v">V</td><td class="x">X</td><td class="note">Zoom: up to 4 sharers; Teams: 1 only</td></tr>
+      <tr><td>Remote Control of Shared Screen</td><td class="v">V</td><td class="p">~</td><td class="note">Teams: PowerPoint only; full desktop control limited</td></tr>
+      <tr><td>Recording — Local</td><td class="v">V</td><td class="x">X</td><td class="note">Teams: cloud only, no local recording</td></tr>
+      <tr><td>Personal Meeting Room / ID</td><td class="v">V</td><td class="x">X</td><td class="note">Teams: no static personal meeting ID</td></tr>
+      <tr><td>Gesture Recognition</td><td class="v">V</td><td class="x">X</td><td class="note">Zoom: raise hand + thumbs-up via camera</td></tr>
+      <tr><td>Focus Mode</td><td class="x">X</td><td class="v">V</td><td class="note">Teams-only: hides video when content is shared</td></tr>
+      <tr><td>End-to-End Encryption</td><td class="v">V</td><td class="p">~</td><td class="note">Teams E2EE disables recording, breakouts, etc.</td></tr>
+      <tr><td>Language Interpretation</td><td class="v">V</td><td class="p">~</td><td class="note">Teams: less mature implementation</td></tr>
+      <tr><td>Together Mode / Immersive View</td><td class="p">~</td><td class="v">V</td><td class="note">Teams: more advanced (Together Mode, 3D events)</td></tr>
+      <tr><td>AI Meeting Summary / Recap</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom: included; Teams: requires Copilot license</td></tr>
+      <tr><td>High-Fidelity Music Mode</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom: 192 kbps; Teams: 128 kbps</td></tr>
+      <tr><td>Participant Limits</td><td class="p">~</td><td class="v">V</td><td class="note">Zoom: 100–1,000 by plan; Teams: 1,000 standard</td></tr>
+      <tr><td>Town Halls / Large Events</td><td class="v">V</td><td class="v">V</td><td class="note">Teams: Live Events retiring Jul 2026</td></tr>
+      <tr><td>Webinar Capabilities</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom: up to 1M; Teams: up to 100K</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================== -->
+<!-- SECTION 3: PHONE                               -->
+<!-- ============================================== -->
+<section>
+  <h2 id="phone">3. Phone</h2>
+  <table>
+    <thead>
+      <tr><th>Topic</th><th>Zoom</th><th>Teams</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Auto-Receptionist / Auto-Attendant</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Call Queues</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Voicemail &amp; Transcription</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom AI included; Teams AI needs Copilot license</td></tr>
+      <tr><td>Audio Conferencing Bridge</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Call Park / Pickup</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Call Transfer (Blind &amp; Consultative)</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Call Forwarding</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Call Flip (Device Switching)</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Call Delegation / Boss-Admin</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Shared Line Appearance</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Hot Desking (Phones)</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Emergency Calling (E911)</td><td class="v">V</td><td class="v">V</td><td class="note">Different location detection methods</td></tr>
+      <tr><td>PSTN Connectivity Options</td><td class="v">V</td><td class="v">V</td><td class="note">Teams: more options (Direct Routing, Operator Connect)</td></tr>
+      <tr><td>International Calling</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom: 49 countries native; Teams: varies by plan</td></tr>
+      <tr><td>Toll-Free Numbers</td><td class="p">~</td><td class="p">~</td><td class="note">Both billed separately; limited availability</td></tr>
+      <tr><td>Common Area Phones</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Analog Device Support (Fax, Paging)</td><td class="v">V</td><td class="p">~</td><td class="note">Teams: Direct Routing + SBC only; no fax with Calling Plans</td></tr>
+      <tr><td>Call Recording (Compliance)</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Call Monitoring (Listen, Whisper, Barge)</td><td class="p">~</td><td class="p">~</td><td class="note">Both: via 3rd-party / contact center only</td></tr>
+      <tr><td>SMS / MMS Messaging</td><td class="v">V</td><td class="p">~</td><td class="note">Teams: SMS only, US/CA, 1-on-1, no MMS</td></tr>
+      <tr><td>Presence Integration</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Advanced Analytics / Reporting</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom: Power Pack add-on; Teams: CQD built-in</td></tr>
+      <tr><td>Contact Center Integration</td><td class="v">V</td><td class="v">V</td><td class="note">Zoom has native CC product</td></tr>
+      <tr><td>IVR (Multi-Level Menus)</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Custom Music on Hold</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Spam Call Detection / Blocking</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Receptionist / Attendant Console</td><td class="p">~</td><td class="v">V</td><td class="note">Zoom: 3rd-party only; Teams: certified consoles</td></tr>
+      <tr><td>Survivable Branch Appliance (SBA)</td><td class="x">X</td><td class="v">V</td><td class="note">PSTN continuity during outages — Teams only</td></tr>
+      <tr><td>DECT Phone Support</td><td class="v">V</td><td class="p">~</td><td class="note">Teams: less prominently featured</td></tr>
+      <tr><td>Certified Desk Phones</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Softphone (Desktop &amp; Mobile)</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Number Porting</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Extension Dialing</td><td class="v">V</td><td class="v">V</td><td class="note"></td></tr>
+      <tr><td>Paging / Intercom</td><td class="v">V</td><td class="p">~</td><td class="note">Teams: SIP Gateway only; not with Calling Plans</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  <p>Generated February 2026 &mdash; Quick reference only. <a href="comparison.html">See detailed version</a> for full explanations. Always verify with vendor for latest status.</p>
+</footer>
+
+</body>
+</html>
