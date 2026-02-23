@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoom to Teams Migration — End-User Insights</title>
+<style>
+  :root {
+    --green: #d4edda; --green-text: #155724;
+    --yellow: #fff3cd; --yellow-text: #856404;
+    --red: #f8d7da; --red-text: #721c24;
+    --blue: #d1ecf1; --blue-text: #0c5460;
+    --gray: #e9ecef; --gray-text: #495057;
+    --header-bg: #1a1a2e; --nav-bg: #16213e;
+    --border: #dee2e6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #333; background: #fff; line-height: 1.6; }
+
+  header { background: var(--header-bg); color: #fff; padding: 1.5rem 2rem 0.8rem; text-align: center; }
+  header h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.2rem; }
+  header p { font-size: 0.9rem; opacity: 0.8; }
+  .header-links { margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+  .header-links a {
+    color: #8ab4f8; text-decoration: none; font-size: 0.8rem;
+    border: 1px solid rgba(138,180,248,0.4); padding: 0.2rem 0.7rem; border-radius: 4px;
+  }
+  .header-links a:hover { background: rgba(138,180,248,0.15); }
+
+  nav {
+    background: var(--nav-bg); padding: 0.6rem 1rem;
+    display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap;
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  nav a { color: #fff; text-decoration: none; font-size: 0.82rem; padding: 0.25rem 0.7rem; border-radius: 4px; }
+  nav a:hover { background: rgba(255,255,255,0.15); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
+  section { margin: 2rem 0; scroll-margin-top: 50px; }
+  section h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.8rem; padding-bottom: 0.4rem; border-bottom: 3px solid var(--nav-bg); }
+  section h3 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.5rem; }
+
+  /* Executive summary */
+  .exec-summary {
+    background: var(--blue); color: var(--blue-text);
+    padding: 1.2rem 1.5rem; border-radius: 8px; margin: 1.5rem 0;
+    font-size: 0.92rem; border-left: 5px solid #0c5460;
+  }
+
+  /* Bar chart */
+  .chart { margin: 1rem 0 1.5rem; }
+  .chart-row { display: flex; align-items: center; margin-bottom: 0.5rem; }
+  .chart-label { width: 160px; font-size: 0.82rem; font-weight: 600; text-align: right; padding-right: 0.8rem; flex-shrink: 0; }
+  .chart-bar-wrap { flex: 1; position: relative; height: 28px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
+  .chart-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 0.6rem; font-size: 0.78rem; font-weight: 600; color: #fff; min-width: 40px; transition: width 0.6s ease; }
+  .chart-bar.green { background: #28a745; }
+  .chart-bar.yellow { background: #ffc107; color: #333; }
+  .chart-bar.gray { background: #6c757d; }
+  .chart-bar.orange { background: #fd7e14; }
+  .chart-bar.red { background: #dc3545; }
+  .chart-bar.blue { background: #17a2b8; }
+
+  /* Cards grid */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .card {
+    border-radius: 8px; padding: 1rem 1.2rem;
+    border-left: 5px solid; font-size: 0.85rem;
+  }
+  .card .card-disc { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; opacity: 0.7; margin-bottom: 0.3rem; }
+  .card .card-title { font-weight: 700; margin-bottom: 0.3rem; }
+  .card .card-note { font-size: 0.8rem; opacity: 0.85; }
+  .card.loss { background: var(--red); border-color: var(--red-text); color: var(--red-text); }
+  .card.gain { background: var(--green); border-color: var(--green-text); color: var(--green-text); }
+  .card.zoom-stronger { background: #fff3e0; border-color: #e65100; color: #bf360c; }
+  .card.teams-stronger { background: #e8eaf6; border-color: #283593; color: #1a237e; }
+  .card.warn { background: var(--yellow); border-color: var(--yellow-text); color: var(--yellow-text); }
+
+  /* Depends breakdown */
+  .depends-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.6rem; margin: 0.8rem 0; }
+  .depends-item {
+    background: var(--gray); padding: 0.5rem 0.8rem; border-radius: 6px;
+    display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;
+  }
+  .depends-item .count { font-weight: 700; font-size: 1rem; color: var(--nav-bg); }
+
+  /* Key messages */
+  .messages { list-style: none; counter-reset: msg; }
+  .messages li {
+    counter-increment: msg; padding: 0.7rem 1rem 0.7rem 3rem;
+    position: relative; margin-bottom: 0.5rem;
+    background: #f8f9fa; border-radius: 6px; font-size: 0.88rem;
+  }
+  .messages li::before {
+    content: counter(msg);
+    position: absolute; left: 0.8rem; top: 0.65rem;
+    width: 22px; height: 22px; background: var(--nav-bg); color: #fff;
+    border-radius: 50%; font-size: 0.75rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .messages li strong { color: var(--nav-bg); }
+
+  footer { text-align: center; padding: 1.5rem; font-size: 0.75rem; color: #888; border-top: 1px solid var(--border); margin-top: 2rem; }
+  footer a { color: #555; }
+
+  @media print {
+    nav { position: static; box-shadow: none; }
+    .card, .depends-item, .messages li, .exec-summary { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .chart-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media (max-width: 600px) {
+    .chart-label { width: 110px; font-size: 0.75rem; }
+    .cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Zoom &rarr; Teams Migration — End-User Insights</h1>
+  <p>Analysis of 165 feature comparisons across 13 disciplines</p>
+  <div class="header-links">
+    <a href="comparison.html">Detailed Comparison</a>
+    <a href="comparison-short.html">Quick Reference (V/X)</a>
+  </div>
+</header>
+
+<nav>
+  <a href="#summary">Summary</a>
+  <a href="#distribution">Distribution</a>
+  <a href="#lose">Users Lose</a>
+  <a href="#gain">Users Gain</a>
+  <a href="#zoom-edge">Zoom Edge</a>
+  <a href="#teams-edge">Teams Edge</a>
+  <a href="#depends">Depends Zone</a>
+  <a href="#ai">AI</a>
+  <a href="#cc">Contact Center</a>
+  <a href="#messages">Key Messages</a>
+</nav>
+
+<div class="container">
+
+<!-- EXECUTIVE SUMMARY -->
+<section id="summary">
+  <div class="exec-summary">
+    <strong>Bottom line:</strong> 44% of features are fully equivalent across both platforms — the core meeting, calling, and room experience will feel familiar. Only 2 features are lost entirely (simultaneous sharing, local recording), while 1 is gained (persistent post-meeting chat). The biggest migration risk isn't technology — it's the 33% of features marked "Depends" that are driven by deployment decisions, IT policies, and change management.
+  </div>
+</section>
+
+<!-- DISTRIBUTION -->
+<section id="distribution">
+  <h2>Feature Parity Overview</h2>
+  <p style="font-size:0.85rem;margin-bottom:0.5rem;">How 165 features compare across Zoom and Teams:</p>
+  <div class="chart">
+    <div class="chart-row">
+      <span class="chart-label">Both Available (V/V)</span>
+      <div class="chart-bar-wrap"><div class="chart-bar green" style="width:43.6%">72 (44%)</div></div>
+    </div>
+    <div class="chart-row">
+      <span class="chart-label">Both Depend on Config</span>
+      <div class="chart-bar-wrap"><div class="chart-bar gray" style="width:33.3%">55 (33%)</div></div>
+    </div>
+    <div class="chart-row">
+      <span class="chart-label">Both Partial</span>
+      <div class="chart-bar-wrap"><div class="chart-bar yellow" style="width:11.5%">19 (12%)</div></div>
+    </div>
+    <div class="chart-row">
+      <span class="chart-label">Zoom Stronger (V/~)</span>
+      <div class="chart-bar-wrap"><div class="chart-bar orange" style="width:6.7%">11 (7%)</div></div>
+    </div>
+    <div class="chart-row">
+      <span class="chart-label">Teams Stronger (~/V)</span>
+      <div class="chart-bar-wrap"><div class="chart-bar blue" style="width:3.0%">5 (3%)</div></div>
+    </div>
+    <div class="chart-row">
+      <span class="chart-label">Users Lose (V/X)</span>
+      <div class="chart-bar-wrap"><div class="chart-bar red" style="width:1.6%">2 (1%)</div></div>
+    </div>
+    <div class="chart-row">
+      <span class="chart-label">Users Gain (X/V)</span>
+      <div class="chart-bar-wrap"><div class="chart-bar green" style="width:1.2%">1 (1%)</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT USERS LOSE -->
+<section id="lose">
+  <h2>What Users Lose (Zoom V &rarr; Teams X)</h2>
+  <p style="font-size:0.85rem;margin-bottom:0.8rem;">These 2 features exist in Zoom but have <strong>no equivalent</strong> in Teams:</p>
+  <div class="cards">
+    <div class="card loss">
+      <div class="card-disc">Content Sharing</div>
+      <div class="card-title">Simultaneous Multi-Presenter Sharing</div>
+      <div class="card-note">Zoom allows up to 4 people to share content at once. Teams supports only 1 sharer at a time. Impacts design reviews, code comparisons, and collaborative sessions.</div>
+    </div>
+    <div class="card loss">
+      <div class="card-disc">Recording</div>
+      <div class="card-title">Local Recording</div>
+      <div class="card-note">Zoom allows recording directly to the local disk. Teams records to cloud (OneDrive/SharePoint) only. Users who relied on local files will need to download from the cloud.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT USERS GAIN -->
+<section id="gain">
+  <h2>What Users Gain (Zoom X &rarr; Teams V)</h2>
+  <p style="font-size:0.85rem;margin-bottom:0.8rem;">This feature is <strong>new</strong> for users moving to Teams:</p>
+  <div class="cards">
+    <div class="card gain">
+      <div class="card-disc">Chat & Async</div>
+      <div class="card-title">Persistent Post-Meeting Chat</div>
+      <div class="card-note">In Zoom, meeting chat disappears after the session. In Teams, the chat thread persists — participants can continue the conversation, share files, and reference history after the meeting ends.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ZOOM STRONGER -->
+<section id="zoom-edge">
+  <h2>Where Zoom is Stronger (V vs Partial)</h2>
+  <p style="font-size:0.85rem;margin-bottom:0.8rem;">Teams supports these 11 features, but with limitations compared to Zoom:</p>
+  <div class="cards">
+    <div class="card zoom-stronger">
+      <div class="card-disc">Contact Center &mdash; 8 features</div>
+      <div class="card-title">Native Contact Center Suite</div>
+      <div class="card-note">Agent availability, IVR routing, queue visibility, callbacks, wrap-up, after-hours routing, caller history, supervisor dashboards — all native in Zoom CC. Teams relies on 3rd-party integrations.</div>
+    </div>
+    <div class="card zoom-stronger">
+      <div class="card-disc">Join & Scheduling</div>
+      <div class="card-title">SIP/H.323 Device Join</div>
+      <div class="card-note">Zoom supports native H.323/SIP join. Teams requires CVI or Teams Rooms Pro for video device interop.</div>
+    </div>
+    <div class="card zoom-stronger">
+      <div class="card-disc">Events</div>
+      <div class="card-title">Multi-Session Event Navigation</div>
+      <div class="card-note">Zoom supports full multi-session events. Teams multi-session depends on event design and may require workarounds.</div>
+    </div>
+    <div class="card zoom-stronger">
+      <div class="card-disc">Events</div>
+      <div class="card-title">Event Branding (Registration/Email)</div>
+      <div class="card-note">Zoom offers built-in branding for registration pages and emails. Teams advanced email customization may require premium licensing.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAMS STRONGER -->
+<section id="teams-edge">
+  <h2>Where Teams is Stronger (Partial vs V)</h2>
+  <p style="font-size:0.85rem;margin-bottom:0.8rem;">These 5 features work better in Teams than in Zoom:</p>
+  <div class="cards">
+    <div class="card teams-stronger">
+      <div class="card-disc">Content Sharing</div>
+      <div class="card-title">PowerPoint Live</div>
+      <div class="card-note">Teams offers a native presenter mode with speaker notes, independent slide navigation for attendees, and real-time translation. Zoom only supports screen-sharing slides.</div>
+    </div>
+    <div class="card teams-stronger">
+      <div class="card-disc">Layouts</div>
+      <div class="card-title">Together Mode / Immersive View</div>
+      <div class="card-note">Teams offers Together Mode (shared virtual space for up to 49) and 3D immersive events. Zoom's immersive view is more limited.</div>
+    </div>
+    <div class="card teams-stronger">
+      <div class="card-disc">Layouts</div>
+      <div class="card-title">Focus on Content Mode</div>
+      <div class="card-note">Teams automatically hides participant video when content is shared, keeping focus on the material. Zoom's focus mode UX differs.</div>
+    </div>
+    <div class="card teams-stronger">
+      <div class="card-disc">Accessibility</div>
+      <div class="card-title">CART Captions Support</div>
+      <div class="card-note">Teams has dedicated CART captions support for events. Zoom supports captions/interpretation but the method differs.</div>
+    </div>
+    <div class="card teams-stronger">
+      <div class="card-disc">Security</div>
+      <div class="card-title">Presenter Policy Controls</div>
+      <div class="card-note">Teams has explicit "who can present" policies configurable by admins. Zoom relies on host-level controls during the meeting.</div>
+    </div>
+  </div>
+</section>
+
+<!-- THE DEPENDS ZONE -->
+<section id="depends">
+  <h2>The "Depends" Zone — 55 Features (33%)</h2>
+  <div class="card warn" style="margin-bottom:1rem;">
+    <div class="card-title">These features aren't about Zoom vs Teams — they're about how you deploy</div>
+    <div class="card-note">55 out of 165 features are marked "Depends/Depends" — meaning the user experience is determined by network quality, hardware choices, IT policies, and organizational decisions, not by the platform itself. This is the highest-risk area for the migration: technology parity exists, but poor deployment can make Teams feel worse than Zoom even when the features are equivalent.</div>
+  </div>
+  <h3>Breakdown by Discipline</h3>
+  <div class="depends-grid">
+    <div class="depends-item"><span>Audio/Video Quality</span><span class="count">14</span></div>
+    <div class="depends-item"><span>Rooms Operations</span><span class="count">9</span></div>
+    <div class="depends-item"><span>Security (End-User)</span><span class="count">6</span></div>
+    <div class="depends-item"><span>Support & Adoption</span><span class="count">6</span></div>
+    <div class="depends-item"><span>Join & Scheduling</span><span class="count">4</span></div>
+    <div class="depends-item"><span>Accessibility</span><span class="count">4</span></div>
+    <div class="depends-item"><span>Telephony</span><span class="count">4</span></div>
+    <div class="depends-item"><span>Recording & Post-Meeting</span><span class="count">3</span></div>
+    <div class="depends-item"><span>Participant Management</span><span class="count">2</span></div>
+    <div class="depends-item"><span>Events Production</span><span class="count">2</span></div>
+    <div class="depends-item"><span>Layouts & Equity</span><span class="count">1</span></div>
+  </div>
+</section>
+
+<!-- AI -->
+<section id="ai">
+  <h2>AI Features — Both Platforms Partial</h2>
+  <div class="card warn">
+    <div class="card-title">AI is a licensing decision, not a platform decision</div>
+    <div class="card-note">All 10 AI features (meeting summaries, action items, catch-me-up, voicemail transcription, chat summarization, call summaries, agent assist) are marked <strong>Partial/Partial</strong> on both platforms. Zoom requires AI Companion; Teams requires M365 Copilot. Neither platform includes full AI capabilities in the base license. The user experience will depend entirely on which AI add-on the organization purchases.</div>
+  </div>
+</section>
+
+<!-- CONTACT CENTER -->
+<section id="cc">
+  <h2>Contact Center — Needs Separate Migration Plan</h2>
+  <div class="card loss" style="border-color:#bf360c; background:#fff3e0; color:#bf360c;">
+    <div class="card-title">8 out of 8 Contact Center features: Zoom V vs Teams Partial</div>
+    <div class="card-note">Zoom has a native, fully integrated Contact Center product. Teams does not — it relies on 3rd-party solutions (e.g., NICE, Genesys, Landis) connected via Azure Communication Services. If the organization currently uses Zoom Contact Center, migrating this workload to Teams is a <strong>separate, complex project</strong> that requires evaluating 3rd-party vendors, integration architecture, and agent retraining. It should not be bundled into the general meetings/rooms/phone migration timeline.</div>
+  </div>
+</section>
+
+<!-- KEY MESSAGES -->
+<section id="messages">
+  <h2>Key Messages for End Users</h2>
+  <ol class="messages">
+    <li><strong>"Most of what you know still works"</strong> — 44% of features are identical on both platforms. The core experience of joining meetings, sharing content, chatting, and making calls carries over.</li>
+    <li><strong>"Screen sharing changes"</strong> — Only 1 person can share at a time in Teams. Plan ahead for sessions that need side-by-side comparisons — use PowerPoint Live or pre-arranged layouts instead.</li>
+    <li><strong>"Recordings go to the cloud"</strong> — No more local recordings. Files will be in OneDrive/SharePoint — accessible from anywhere, but requires downloading if you need an offline copy.</li>
+    <li><strong>"Your meeting chat lives on"</strong> — Unlike Zoom, Teams keeps the meeting chat thread alive after the meeting. You can continue conversations, share follow-ups, and find files there.</li>
+    <li><strong>"AI is similar — licensing is different"</strong> — If the org licenses M365 Copilot, you get meeting summaries, action items, and catch-up features. Without it, these features will be limited — just like Zoom without AI Companion.</li>
+    <li><strong>"Contact Center users — stay tuned"</strong> — The CC migration is a separate workstream. Your current workflows will be communicated separately with dedicated training.</li>
+  </ol>
+</section>
+
+</div>
+
+<footer>
+  <p>Generated February 2026 &mdash; Based on analysis of 165 features across 13 disciplines. <a href="comparison.html">Detailed comparison</a> &bull; <a href="comparison-short.html">Quick reference</a></p>
+</footer>
+
+</body>
+</html>
