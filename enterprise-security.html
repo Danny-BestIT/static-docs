@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>אבטחת מידע ב-LS Duet | מסמך טכני</title>
+<meta name="description" content="מסמך טכני ארגוני בנושא אבטחת מידע ב-LS Duet: ארכיטקטורה, אימות, הצפנה, שמירת מידע, GDPR, וספקי משנה.">
+<meta name="theme-color" content="#4A9FD9">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --life-blue: #4A9FD9;
+    --life-sand: #C4B49A;
+    --life-gray-light: #D4D6DF;
+    --life-gray-dark: #808291;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Heebo', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+  .hero {
+    position: relative;
+    background: var(--life-blue);
+    color: #fff;
+    padding: 64px 24px 88px;
+    border-radius: 0 0 28px 28px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50px; inset-inline-end: -50px;
+    width: 220px; height: 220px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; inset-inline-start: -40px;
+    width: 160px; height: 160px;
+    background: rgba(196,180,154,0.28);
+    border-radius: 50%;
+  }
+  .hero-inner {
+    position: relative;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  .brand {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.30);
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    line-height: 1.25;
+  }
+  .hero .subtitle {
+    font-size: 18px;
+    font-weight: 500;
+    opacity: 0.95;
+    margin: 0 0 8px;
+  }
+  .hero .meta {
+    font-size: 13px;
+    opacity: 0.8;
+    margin: 0;
+  }
+  .container {
+    max-width: 920px;
+    margin: -48px auto 0;
+    padding: 0 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    scroll-margin-top: 24px;
+  }
+  .card.summary {
+    border-color: rgba(74,159,217,0.25);
+    background: linear-gradient(135deg, #fff 0%, rgba(74,159,217,0.04) 100%);
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 9999px;
+    background: rgba(74,159,217,0.15);
+    color: var(--life-blue);
+    font-weight: 700;
+    font-size: 14px;
+    margin-inline-end: 10px;
+    vertical-align: middle;
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(74,159,217,0.18);
+    display: flex;
+    align-items: center;
+  }
+  h2 .h2-text { vertical-align: middle; }
+  h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 22px 0 10px;
+    color: var(--text);
+  }
+  p { margin: 0 0 12px; color: var(--text); }
+  ul, ol { padding-inline-start: 24px; margin: 0 0 8px; }
+  li { margin-bottom: 10px; }
+  ul li::marker { color: var(--life-blue); }
+  ol li::marker { color: var(--life-blue); font-weight: 600; }
+  .table-wrap {
+    overflow-x: auto;
+    margin: 16px 0 4px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    background: #fff;
+  }
+  th, td {
+    padding: 12px 16px;
+    text-align: start;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: rgba(74,159,217,0.10);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(74,159,217,0.03); }
+  code {
+    font-family: 'SFMono-Regular', Consolas, Monaco, monospace;
+    background: rgba(74,159,217,0.10);
+    color: var(--text);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    direction: ltr;
+    display: inline-block;
+  }
+  strong { color: var(--text); font-weight: 600; }
+  a { color: var(--life-blue); text-decoration: none; font-weight: 500; }
+  a:hover { text-decoration: underline; }
+  .toc {
+    background: linear-gradient(135deg, rgba(74,159,217,0.06) 0%, rgba(196,180,154,0.06) 100%);
+    border: 1px solid rgba(74,159,217,0.20);
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .toc-title {
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--life-blue);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 24px;
+  }
+  .toc-list li { margin: 0; }
+  .toc-list a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 10px;
+    color: var(--text);
+    font-weight: 500;
+    font-size: 14.5px;
+    transition: background 0.15s;
+  }
+  .toc-list a:hover { background: rgba(74,159,217,0.10); text-decoration: none; }
+  .toc-list .num { color: var(--life-blue); font-weight: 700; margin-inline-end: 6px; }
+  .quote {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    background: rgba(196,180,154,0.15);
+    border-inline-start: 4px solid var(--life-sand);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin: 8px 0 4px;
+  }
+  footer {
+    margin-top: 16px;
+    padding: 28px 32px;
+    background: rgba(196,180,154,0.15);
+    border: 1px solid rgba(196,180,154,0.40);
+    border-radius: 20px;
+    text-align: center;
+  }
+  footer .label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+  footer .name { font-weight: 700; font-size: 18px; }
+  footer .email { display: inline-block; margin-top: 6px; font-size: 15px; }
+  @media (max-width: 720px) {
+    .toc-list { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .hero { padding: 44px 20px 64px; }
+    .hero h1 { font-size: 26px; }
+    .container { padding: 0 16px 60px; }
+    .card { padding: 22px 22px; }
+    h2 { font-size: 19px; }
+    .section-num { width: 28px; height: 28px; font-size: 13px; }
+    th, td { padding: 10px 12px; font-size: 13.5px; }
+  }
+  @media print {
+    body { background: #fff; }
+    .hero { border-radius: 0; }
+    .hero::before, .hero::after { display: none; }
+    .card, footer, .toc { box-shadow: none; }
+    .card { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="brand">LS Duet · Enterprise</span>
+    <h1>אבטחת מידע ב‑LS Duet</h1>
+    <p class="subtitle">מסמך טכני ללקוחות ארגוניים</p>
+    <p class="meta">עדכון אחרון: אפריל 2026</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <nav class="toc" aria-label="תוכן עניינים">
+    <div class="toc-title">תוכן עניינים</div>
+    <ul class="toc-list">
+      <li><a href="#s1"><span class="num">1.</span>תקציר מנהלים</a></li>
+      <li><a href="#s2"><span class="num">2.</span>ארכיטקטורה במבט-על</a></li>
+      <li><a href="#s3"><span class="num">3.</span>תקשורת מאובטחת</a></li>
+      <li><a href="#s4"><span class="num">4.</span>אימות והרשאות</a></li>
+      <li><a href="#s5"><span class="num">5.</span>כיצד השרתים מאובטחים</a></li>
+      <li><a href="#s6"><span class="num">6.</span>היכן המידע נשמר וכמה זמן</a></li>
+      <li><a href="#s7"><span class="num">7.</span>הצפנה — סיכום</a></li>
+      <li><a href="#s8"><span class="num">8.</span>ספקי משנה</a></li>
+      <li><a href="#s9"><span class="num">9.</span>תאימות וזכויות (GDPR)</a></li>
+      <li><a href="#s10"><span class="num">10.</span>מה הפתרון לא עושה</a></li>
+      <li><a href="#s11"><span class="num">11.</span>שקיפות לגבי WhatsApp Bridge</a></li>
+      <li><a href="#s12"><span class="num">12.</span>ניטור ואירועי אבטחה</a></li>
+    </ul>
+  </nav>
+
+  <section id="s1" class="card summary">
+    <h2><span class="section-num">1</span><span class="h2-text">תקציר מנהלים</span></h2>
+    <p>LS Duet בנוי בגישת <strong>Local-First</strong>: רוב המידע שלך נשמר על המכשיר שלך עצמו, לא בענן שלנו. בענן נשמר רק המינימום התפעולי ההכרחי, באזור <strong>האיחוד האירופי (Frankfurt)</strong>, בתשתית <strong>Google Cloud / Firebase</strong>. כל המידע מוצפן במעבר (TLS) ובאחסון (AES‑256), הגישה אליו מוגבלת אך ורק לבעלי החשבון, ותוכן ההודעות נמחק מהשרת <strong>אוטומטית תוך 48 שעות</strong>. לא נעשה שימוש בתוכן שלך לפרסום, פרופיילינג, או אימון מודלים, ולא נמכר לאף צד שלישי.</p>
+  </section>
+
+  <section id="s2" class="card">
+    <h2><span class="section-num">2</span><span class="h2-text">ארכיטקטורה במבט-על</span></h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>שכבה</th><th>טכנולוגיה</th><th>היכן רץ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>אפליקציית מובייל</td><td>React Native + Expo (iOS/Android)</td><td>המכשיר של המשתמש</td></tr>
+          <tr><td>בסיס נתונים מקומי</td><td>SQLite (מוצפן ע"י ה‑OS)</td><td>כחלק מהאפליקציה במכשיר</td></tr>
+          <tr><td>Backend</td><td>Firebase Cloud Functions (Node.js 22)</td><td>Google Cloud — <code>europe-west3</code> (Frankfurt)</td></tr>
+          <tr><td>בסיס נתונים בענן</td><td>Cloud Firestore</td><td>Google Cloud — <code>europe-west3</code> (Frankfurt)</td></tr>
+          <tr><td>גשר WhatsApp</td><td>WAHA</td><td>שרתים מנוהלים שלנו</td></tr>
+          <tr><td>תרגום</td><td>Anthropic Claude API</td><td>תקשורת ישירה Google Cloud ↔ Anthropic</td></tr>
+          <tr><td>אימות</td><td>Firebase Authentication</td><td>Google Identity</td></tr>
+          <tr><td>משלוח מתוזמן</td><td>Google Cloud Tasks</td><td>Google Cloud — <code>europe-west3</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="quote"><strong>אין לנו שרתים פיזיים, אין SSH, אין מכונות וירטואליות לתחזוקה ידנית</strong> — כל ה‑Backend הוא Serverless ומנוהל ע"י Google Cloud.</p>
+  </section>
+
+  <section id="s3" class="card">
+    <h2><span class="section-num">3</span><span class="h2-text">תקשורת מאובטחת</span></h2>
+    <ul>
+      <li><strong>כל ערוצי התקשורת</strong>: HTTPS / TLS 1.2+ בלבד. אין נתיב לא־מוצפן.</li>
+      <li><strong>כל קריאה ל‑Cloud Function</strong> דורשת <strong>Firebase ID Token תקף</strong> (JWT חתום) בכותרת <code>Authorization: Bearer …</code>. הטוקן מאומת בכל קריאה דרך <code>admin.auth().verifyIdToken()</code> ב‑Google.</li>
+      <li><strong>Webhook נכנס מ‑WAHA</strong>: מאומת בסוד משותף (<code>x-waha-webhook-secret</code>) — בקשות ללא הסוד נדחות עם 401.</li>
+      <li><strong>קריאות יוצאות ל‑WAHA</strong>: עוברות מהענן שלנו בלבד, עם <code>X-Api-Key</code> פר‑סשן. מפתחות ה‑API לעולם לא נחשפים ללקוח.</li>
+      <li><strong>Cloud Tasks → Cloud Functions</strong> (להפעלת הודעות מתוזמנות): מאומת באמצעות <strong>OIDC token</strong> של חשבון שירות ייעודי.</li>
+      <li><strong>דשבורד אדמין</strong>: Google Sign‑In + רשימת מאושרים סגורה (email whitelist) הנאכפת בצד השרת.</li>
+    </ul>
+  </section>
+
+  <section id="s4" class="card">
+    <h2><span class="section-num">4</span><span class="h2-text">אימות והרשאות</span></h2>
+    <h3>4.1 אימות משתמש</h3>
+    <ul>
+      <li>Firebase Authentication עם בחירה בין: <strong>Google Sign‑In</strong>, <strong>Sign in with Apple</strong> (iOS), אימייל/סיסמה.</li>
+      <li>תקני אבטחה של Google: זיהוי דו־שלבי תלוי בהגדרות חשבון Google של המשתמש.</li>
+    </ul>
+    <h3>4.2 הפרדת משתמשים בענן (Firestore Security Rules)</h3>
+    <p>ברירת המחדל היא <strong>deny‑by‑default</strong>. אכיפה כפולה — גם בכללי האבטחה וגם ב‑Cloud Function:</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>אוסף</th><th>קריאה</th><th>כתיבה</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>users/{uid}/...</code></td><td>רק בעל ה‑uid</td><td>רק בעל ה‑uid</td></tr>
+          <tr><td><code>whatsappMessages</code></td><td><strong>חסום ללקוח</strong> — רק דרך Cloud Function שמסננת לפי uid</td><td>חסום ללקוח</td></tr>
+          <tr><td><code>translationSettings</code></td><td>חסום ללקוח</td><td>חסום ללקוח</td></tr>
+          <tr><td><code>scheduledMessages</code></td><td>חסום ללקוח</td><td>חסום ללקוח</td></tr>
+          <tr><td><code>wahaAssignments/{uid}</code></td><td>רק בעל ה‑uid</td><td>חסום ללקוח (רק שרת)</td></tr>
+          <tr><td><code>pushTokens/{uid}</code></td><td>רק בעל ה‑uid</td><td>חסום ללקוח</td></tr>
+          <tr><td><code>licenses/{uid}</code></td><td>רק בעל ה‑uid</td><td>חסום ללקוח</td></tr>
+          <tr><td>כללי</td><td>חסום</td><td>חסום</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="quote">המשמעות: גם אם תוקף ישיג טוקן מזויף, אין נתיב פיזי לקרוא או לכתוב מידע של משתמש אחר.</p>
+  </section>
+
+  <section id="s5" class="card">
+    <h2><span class="section-num">5</span><span class="h2-text">כיצד השרתים מאובטחים</span></h2>
+    <p>הענן שלנו רץ במלואו על <strong>Google Cloud Platform</strong>. אנחנו נהנים אוטומטית מהבקרות והתעודות של Google:</p>
+    <ul>
+      <li><strong>תקני תאימות</strong>: ISO 27001, ISO 27017, ISO 27018, SOC 1/2/3, PCI‑DSS, GDPR, HIPAA‑ready.</li>
+      <li><strong>הצפנת דיסק במנוחה</strong>: AES‑256 על כל הדיסקים והגיבויים, אוטומטית ושקופה.</li>
+      <li><strong>הקשחת רשת</strong>: ה‑Cloud Functions רצים בסביבת ריצה מבודדת; אין יציאות פתוחות מלבד ה‑HTTPS endpoints המוצהרים.</li>
+      <li><strong>ניהול סודות</strong>: כל מפתחות ה‑API של צדדים שלישיים נשמרים ב‑<strong>Google Secret Manager</strong>, מוצפנים, ונחשפים רק בזמן ריצה לפונקציה שצריכה אותם. אין סיסמאות בקוד, ב‑Git, או בקובצי קונפיגורציה.</li>
+      <li><strong>לוגים וניטור</strong>: Cloud Logging עם שמירת לוגים מובנים וגישה מבוקרת.</li>
+    </ul>
+  </section>
+
+  <section id="s6" class="card">
+    <h2><span class="section-num">6</span><span class="h2-text">היכן המידע נשמר וכמה זמן</span></h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>סוג המידע</th><th>מיקום</th><th>תקופת שמירה</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>תוכן הודעות (היסטוריה מלאה)</strong></td><td>מקומי על המכשיר (SQLite)</td><td>עד שהמשתמש מוחק את האפליקציה / חשבונו</td></tr>
+          <tr><td><strong>תוכן הודעות בענן (מאגר זמני)</strong></td><td>Firestore</td><td><strong>≤ 48 שעות</strong> — בשלב הבטא נמחק אוטומטית ע"י משימה מתוזמנת שרצה כל שעה</td></tr>
+          <tr><td>אנשי קשר, פריטי ידע, פעילויות</td><td><strong>מקומי בלבד</strong> (SQLite)</td><td>עד מחיקה</td></tr>
+          <tr><td>הגדרות תרגום פר־איש קשר</td><td>Firestore</td><td>עד שהמשתמש מסיר אותן</td></tr>
+          <tr><td>הודעות מתוזמנות (ממתינות)</td><td>Firestore + Cloud Tasks</td><td>עד שליחה / ביטול. לאחר אישור הקליינט — נמחק מיידית</td></tr>
+          <tr><td>מצב סשן WhatsApp</td><td>Firestore (מוצפן ע"י Google Cloud)</td><td>עד ניתוק יזום</td></tr>
+          <tr><td>Push Token</td><td>Firestore</td><td>עד התנתקות / ביטול</td></tr>
+          <tr><td>חשבון משתמש (אימייל, UID, שם)</td><td>Firebase Auth</td><td>עד מחיקת חשבון</td></tr>
+          <tr><td>מדדי שימוש מצרפיים (אנונימיים)</td><td>Firestore</td><td>קבוע</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>מחיקה אוטומטית של תוכן הודעות</strong> מתבצעת ע"י הפונקציה המתוזמנת <code>cleanupExpiredMessages</code> (שדה <code>expiresAt</code> + מחיקה ב‑batch אחת לשעה).</p>
+  </section>
+
+  <section id="s7" class="card">
+    <h2><span class="section-num">7</span><span class="h2-text">הצפנה — סיכום</span></h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>היכן</th><th>אופן ההצפנה</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>במעבר (כל קישור רשת)</td><td>TLS 1.2+</td></tr>
+          <tr><td>בענן (במנוחה)</td><td>AES‑256‑GCM אוטומטי על כל ה‑Firestore, Cloud Tasks, Cloud Logging, Secret Manager</td></tr>
+          <tr><td>במכשיר (במנוחה)</td><td>iOS Data Protection / Android sandbox + הצפנת FBE של ה‑OS</td></tr>
+          <tr><td>WhatsApp E2E</td><td>נשמר בין לקוחות WhatsApp הקצה. בקטע שבו ההודעה עוברת דרכנו — מוגנת ע"י TLS + הצפנת המנוחה.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s8" class="card">
+    <h2><span class="section-num">8</span><span class="h2-text">ספקי משנה (Subprocessors)</span></h2>
+    <p>לכל ספק יש תפקיד תפעולי מוגדר, וחתום על המחויבויות החוזיות שלו. <strong>אין שיתוף עם רשתות פרסום, brokers, או צדדי ג' לצרכי שיווק.</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>ספק</th><th>תפקיד</th><th>מה משותף איתו</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Google Firebase</strong> (Auth, Firestore, Cloud Functions, Cloud Messaging, Cloud Tasks)</td><td>תשתית ענן</td><td>אימייל, UID, Push Token, מידע WhatsApp זמני (≤48h)</td></tr>
+          <tr><td><strong>Anthropic (Claude API)</strong></td><td>תרגום הודעות (רק כשהמשתמש הפעיל לאיש קשר ספציפי)</td><td>טקסט ההודעה בלבד — ללא מזהי משתמש, ללא טלפון, ללא מטא‑נתונים. <strong>Anthropic אינה שומרת את הטקסט לאימון.</strong></td></tr>
+          <tr><td><strong>Apple (Sign in with Apple)</strong></td><td>אימות בלבד (iOS)</td><td>מזהה Apple, אימייל (או כתובת ממסר אנונימית), שם</td></tr>
+          <tr><td><strong>Google Identity</strong></td><td>אימות Google Sign‑In</td><td>אימייל, UID, שם</td></tr>
+          <tr><td><strong>OpsCenter / WAHA</strong> (תפעולי שלנו)</td><td>גשר התקשורת ל‑WhatsApp</td><td>תוכן הודעות בזמן הגשר. מתנהג כ"לקוח WhatsApp נוסף" של המשתמש.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s9" class="card">
+    <h2><span class="section-num">9</span><span class="h2-text">תאימות וזכויות (GDPR / נושאי מידע)</span></h2>
+    <ul>
+      <li><strong>אזור אירופאי</strong>: כל המידע יושב ב‑<code>europe-west3</code> (Frankfurt, גרמניה).</li>
+      <li><strong>זכויות נושא המידע</strong>: גישה, תיקון, מחיקה, ניידות, חזרה מהסכמה — בכל עת.</li>
+      <li><strong>מחיקת חשבון</strong>: דרך האפליקציה (התנתקות + הסרה מוחקות את כל המידע המקומי) או בדרישה במייל. <strong>המידע ב‑Backend נמחק תוך 30 יום, גיבויים מטוהרים תוך 90 יום.</strong></li>
+      <li><strong>ביטול הסכמה לתרגום / לייבוא אנשי קשר</strong>: בלחיצת כפתור באפליקציה.</li>
+      <li><strong>לא נאספים מזהי פרסום</strong> (IDFA / GAID).</li>
+      <li><strong>לא מתבצע מעקב</strong> cross‑app / cross‑site.</li>
+      <li><strong>מדיניות פרטיות מלאה זמינה ציבורית</strong> ומקושרת ישירות מתפריט ההגדרות באפליקציה.</li>
+    </ul>
+  </section>
+
+  <section id="s10" class="card">
+    <h2><span class="section-num">10</span><span class="h2-text">מה הפתרון לא עושה</span></h2>
+    <ul>
+      <li><strong>לא מאמן AI</strong> על תוכן ההודעות / אנשי הקשר / הידע שלך.</li>
+      <li><strong>לא מוכר נתונים</strong> ולא משתף עם רשתות פרסום.</li>
+      <li><strong>לא יוצר פרופיל התנהגותי</strong> של המשתמש.</li>
+      <li><strong>לא משתמש ב‑cookies</strong> לצורך מעקב.</li>
+      <li><strong>לא מאחסן תוכן הודעות בענן יותר מ‑48 שעות בשלב הבטא.</strong> עם המעבר לייצור מלא ההודעות ימחקו מיד לאחר קבלתן באפליקציית הלקוח.</li>
+      <li><strong>לא מאפשר למשתמש אחד לראות נתונים של משתמש אחר</strong> — לא מכל נתיב.</li>
+    </ul>
+  </section>
+
+  <section id="s11" class="card">
+    <h2><span class="section-num">11</span><span class="h2-text">שקיפות לגבי WhatsApp Bridge</span></h2>
+    <p>חשוב לנו להיות שקופים: WhatsApp עצמה היא End‑to‑End מוצפנת בין הלקוחות שלה. כשאתם מחברים את LS Duet ל‑WhatsApp, אנחנו מתפקדים כ<strong>לקוח WhatsApp נוסף שלכם</strong> (דרך WAHA). המשמעות:</p>
+    <ul>
+      <li>ההודעות עוברות בקטע אחד דרך השרת שלנו, כדי שנוכל להעביר אותן למכשיר שלכם, לתרגם (אם הפעלתם), ולתזמן.</li>
+      <li>בקטע הזה — <strong>הצפנה ב‑TLS, הצפנה במנוחה, ומחיקה אוטומטית תוך 48 שעות</strong>.</li>
+      <li>אין נתיב שבו עובד שלנו ניגש ל‑Firestore לצפייה בהודעות שלכם — Firestore Security Rules חוסמות גם את אנשי הצוות מקריאה ישירה של אוסף <code>whatsappMessages</code>.</li>
+    </ul>
+  </section>
+
+  <section id="s12" class="card">
+    <h2><span class="section-num">12</span><span class="h2-text">ניטור, אירועי אבטחה, ויצירת קשר</span></h2>
+    <ul>
+      <li><strong>לוגים מובנים</strong> ב‑Cloud Logging — גישה מוגבלת לאדמין מערכת.</li>
+      <li><strong>ניטור שגיאות</strong> ב‑Cloud Functions עם התראות.</li>
+      <li><strong>דיווח על ממצא אבטחה</strong>: באמצעות מייל ל־<a href="mailto:info@best-it.co.il">info@best-it.co.il</a> בנושא <code>Security</code>. אנו מתחייבים לאישור קבלה תוך 72 שעות ולתחקור פרטני.</li>
+      <li><strong>בקשות נושא מידע (DSAR)</strong>: באותה כתובת.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div class="label">צור קשר</div>
+    <div class="name">Dan Shor / BestIT</div>
+    <a class="email" href="mailto:info@best-it.co.il">info@best-it.co.il</a>
+  </footer>
+
+</main>
+
+</body>
+</html>

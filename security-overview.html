@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>אבטחת מידע ב-LS Duet | סקירה למנהלים</title>
+<meta name="description" content="המידע שלך ב-LS Duet — סקירה ידידותית בנושא אבטחת מידע, פרטיות, ושמירת נתונים. בשפה ברורה, ללא ז'רגון טכני.">
+<meta name="theme-color" content="#4A9FD9">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --life-blue: #4A9FD9;
+    --life-sand: #C4B49A;
+    --life-gray-light: #D4D6DF;
+    --life-gray-dark: #808291;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Heebo', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .hero {
+    position: relative;
+    background: var(--life-blue);
+    color: #fff;
+    padding: 64px 24px 88px;
+    border-radius: 0 0 28px 28px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50px; inset-inline-end: -50px;
+    width: 220px; height: 220px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; inset-inline-start: -40px;
+    width: 160px; height: 160px;
+    background: rgba(196,180,154,0.28);
+    border-radius: 50%;
+  }
+  .hero-inner {
+    position: relative;
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  .brand {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.30);
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    line-height: 1.25;
+  }
+  .hero .subtitle {
+    font-size: 18px;
+    font-weight: 500;
+    opacity: 0.95;
+    margin: 0 0 8px;
+  }
+  .hero .meta {
+    font-size: 13px;
+    opacity: 0.8;
+    margin: 0;
+  }
+  .container {
+    max-width: 880px;
+    margin: -48px auto 0;
+    padding: 0 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .card.intro {
+    border-color: rgba(74,159,217,0.25);
+    background: linear-gradient(135deg, #fff 0%, rgba(74,159,217,0.04) 100%);
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(74,159,217,0.18);
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 20px 0 10px;
+    color: var(--text);
+  }
+  p { margin: 0 0 12px; color: var(--text); }
+  ul, ol { padding-inline-start: 24px; margin: 0 0 8px; }
+  li { margin-bottom: 10px; }
+  ul li::marker { color: var(--life-blue); }
+  ol li::marker { color: var(--life-blue); font-weight: 600; }
+  .table-wrap {
+    overflow-x: auto;
+    margin: 16px 0 4px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    background: #fff;
+  }
+  th, td {
+    padding: 14px 18px;
+    text-align: start;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: rgba(74,159,217,0.10);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(74,159,217,0.03); }
+  code {
+    font-family: 'SFMono-Regular', Consolas, Monaco, monospace;
+    background: rgba(74,159,217,0.10);
+    color: var(--text);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.9em;
+  }
+  strong { color: var(--text); font-weight: 600; }
+  a { color: var(--life-blue); text-decoration: none; font-weight: 500; }
+  a:hover { text-decoration: underline; }
+  .pills { display: flex; flex-direction: column; gap: 12px; margin: 8px 0 4px; }
+  .pill {
+    background: rgba(74,159,217,0.08);
+    border: 1px solid rgba(74,159,217,0.25);
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .pill .icon {
+    flex: 0 0 32px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--life-blue);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .pill .icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .pill .text { flex: 1; }
+  .pill .text strong { display: block; margin-bottom: 2px; }
+  .quote {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text);
+    background: rgba(196,180,154,0.15);
+    border-inline-start: 4px solid var(--life-sand);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 8px 0 4px;
+  }
+  .cta {
+    background: linear-gradient(135deg, rgba(74,159,217,0.10) 0%, rgba(196,180,154,0.10) 100%);
+    border: 1px solid rgba(74,159,217,0.30);
+    border-radius: 20px;
+    padding: 28px 32px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .cta a.btn {
+    display: inline-block;
+    background: var(--life-blue);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 9999px;
+    font-weight: 600;
+    margin-top: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .cta a.btn:hover { text-decoration: none; transform: scale(1.03); box-shadow: 0 4px 16px rgba(74,159,217,0.30); }
+  .cta .audience { display: block; color: var(--text-muted); font-size: 14px; margin-top: 14px; }
+  footer {
+    margin-top: 16px;
+    padding: 28px 32px;
+    background: rgba(196,180,154,0.15);
+    border: 1px solid rgba(196,180,154,0.40);
+    border-radius: 20px;
+    text-align: center;
+  }
+  footer .label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+  footer .name { font-weight: 700; font-size: 18px; }
+  footer .email { display: inline-block; margin-top: 6px; font-size: 15px; }
+  @media (max-width: 640px) {
+    .hero { padding: 44px 20px 64px; }
+    .hero h1 { font-size: 26px; }
+    .container { padding: 0 16px 60px; }
+    .card { padding: 22px 22px; }
+    h2 { font-size: 20px; }
+    th, td { padding: 11px 13px; font-size: 14px; }
+  }
+  @media print {
+    body { background: #fff; }
+    .hero { border-radius: 0; }
+    .hero::before, .hero::after { display: none; }
+    .card, footer, .cta { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="brand">LS Duet</span>
+    <h1>המידע שלך ב‑LS Duet — מה חשוב לדעת</h1>
+    <p class="subtitle">מדריך מקוצר לשלב הבטא</p>
+    <p class="meta">עדכון אחרון: אפריל 2026</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="card intro">
+    <p>אנחנו יודעים שאמון של ארגון בכלי חדש מתחיל בשאלה אחת פשוטה: <strong>"מה קורה למידע שלי?"</strong>. הדף הזה עונה על השאלה הזו בשפה ישירה, בלי מלל טכני. אם תרצו את הפרטים הטכניים המלאים, יש לכך מסמך נפרד בסוף.</p>
+  </section>
+
+  <section class="card">
+    <h2>בקצרה — מה שצריך לזכור</h2>
+    <div class="pills">
+      <div class="pill">
+        <span class="icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <div class="text"><strong>המידע שלך נשאר אצלך.</strong>רוב המידע (ההודעות, אנשי הקשר, הידע) שמור על הטלפון שלך, לא אצלנו.</div>
+      </div>
+      <div class="pill">
+        <span class="icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <div class="text"><strong>השרתים שלנו באירופה.</strong>התשתית רצה ב‑Frankfurt, גרמניה, על Google Cloud — תחת חוקי הפרטיות המחמירים של ה‑GDPR.</div>
+      </div>
+      <div class="pill">
+        <span class="icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <div class="text"><strong>הודעות בענן נמחקות אוטומטית תוך 48 שעות.</strong>השרת שלנו הוא תחנת מעבר, לא מחסן.</div>
+      </div>
+      <div class="pill">
+        <span class="icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <div class="text"><strong>רק אתה יכול לראות את המידע שלך.</strong>גם לא אנחנו.</div>
+      </div>
+      <div class="pill">
+        <span class="icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <div class="text"><strong>אנחנו לא מוכרים את המידע שלך</strong>לא משתמשים בו לפרסום, ולא מאמנים בעזרתו AI.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>איך זה עובד, במשפט אחד</h2>
+    <p class="quote">LS Duet היא בעצם הרחבה של הוואטסאפ שלך — אנחנו מחברים אותך לחשבון הוואטסאפ שלך כדי שתוכל לתרגם הודעות אוטומטית, לתזמן הודעות, ולנהל אנשי קשר. <strong>אנחנו לא יוצרים חשבון חדש, ולא ניגשים להודעות שלך מעבר למה שאתה בעצמך עושה דרך האפליקציה.</strong></p>
+  </section>
+
+  <section class="card">
+    <h2>איפה המידע יושב</h2>
+    <p>חשבנו על זה בגישה הפוכה מרוב האפליקציות: <strong>במקום לאסוף הכל לענן, אנחנו שומרים כמה שפחות בענן.</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>מה</th><th>איפה הוא נשמר</th><th>למה?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ההודעות שלך</td><td>על הטלפון שלך</td><td>אין סיבה ששרת חיצוני יחזיק אותן</td></tr>
+          <tr><td>אנשי הקשר שלך</td><td>על הטלפון שלך</td><td>זה עניין אישי שלך</td></tr>
+          <tr><td>בסיס הידע / משימות</td><td>על הטלפון שלך</td><td>רק אתה צריך לגשת אליו</td></tr>
+          <tr><td>הודעות שמתוזמנות לעתיד</td><td>בענן (עד שיישלחו)</td><td>חייבים שמישהו ישלח אותן בזמן הנכון, גם אם הטלפון שלך כבוי</td></tr>
+          <tr><td>הגדרות תרגום</td><td>בענן</td><td>נדרשות כדי שהמערכת תתרגם הודעות בזמן אמת</td></tr>
+          <tr><td>חיבור הוואטסאפ</td><td>בענן</td><td>שמירה על החיבור פעיל</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>"ההודעות שלי עוברות בשרת שלכם — מה קורה איתן?"</h2>
+    <p>זו שאלה הוגנת. הנה התשובה הפשוטה:</p>
+    <ol>
+      <li><strong>בדרך</strong> ההודעה מוצפנת (כמו ב‑HTTPS של אתרי בנקים).</li>
+      <li><strong>בענן</strong> היא נשמרת באחסון מוצפן של Google.</li>
+      <li><strong>הזמן המקסימלי</strong> שההודעה נמצאת אצלנו: <strong>48 שעות</strong>. אחרי זה היא נמחקת אוטומטית, גם אם לא ביקשת.</li>
+      <li><strong>הגישה</strong> אליה חסומה לכל אדם — כולל אנשי הצוות שלנו. גם הוצאנו לעצמנו את היכולת לקרוא הודעות של משתמשים דרך כללי האבטחה של הענן.</li>
+      <li><strong>במעבר לשלב הייצור המלא</strong>, המחיקה תהיה מיידית — מרגע שההודעה הגיעה לטלפון שלך, היא נמחקת מהשרת.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>"מי יכול לראות את המידע שלי?"</h2>
+    <p class="quote"><strong>רק אתה.</strong> ואנחנו מתכוונים לזה.</p>
+    <ul>
+      <li>כדי לגשת למידע שלך, צריך להיות מחובר עם החשבון שלך (Google / Apple / מייל וסיסמה).</li>
+      <li>בענן יש "שכבת הגנה" שמאמתת בכל בקשה ובקשה שהיא באמת ממך, ושאתה מנסה לגשת רק לנתונים שלך.</li>
+      <li>אנחנו, כצוות, לא יכולים לראות את ההודעות שלך.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>"מה קורה למידע שלי במקרים מיוחדים?"</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>מצב</th><th>מה קורה</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>אני רוצה למחוק חשבון</strong></td><td>במייל אלינו או בהתנתקות מהאפליקציה. כל המידע נמחק מהשרת תוך 30 יום, מהגיבויים תוך 90 יום.</td></tr>
+          <tr><td><strong>אני רוצה את כל המידע שלי</strong></td><td>תפנה אלינו במייל ונספק את המידע במבנה קריא ונייד.</td></tr>
+          <tr><td><strong>שכחתי את הטלפון שלי</strong></td><td>המידע על הטלפון מוגן ע"י הצפנת מערכת ההפעלה (iOS/Android). מי שלא יודע את קוד הפתיחה לא נכנס.</td></tr>
+          <tr><td><strong>גנבו את הטלפון שלי</strong></td><td>כנ"ל. נוסף לכך — ניתן להתנתק מרחוק דרך חשבון Google/Apple.</td></tr>
+          <tr><td><strong>מישהו ניסה לפרוץ לחשבון שלי</strong></td><td>החשבון מאובטח דרך Google/Apple, עם כל מנגנוני ה‑2FA והגנת ההתחברות שלהם.</td></tr>
+          <tr><td><strong>אנחנו מפסיקים את השירות</strong></td><td>תקבל הודעה מראש, ויהיה לך זמן לייצא את כל המידע שלך.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>"אילו חברות חיצוניות מעורבות?"</h2>
+    <p>מספר מצומצם, וכל אחת עם תפקיד ברור. <strong>אף אחת מהן לא משתמשת במידע שלך לצרכים שלה:</strong></p>
+    <ul>
+      <li><strong>Google (Firebase)</strong> — תשתית הענן שלנו. הם מארחים את השרתים, מצפינים את המידע, ומספקים אימות. הם לא קוראים את התוכן.</li>
+      <li><strong>Anthropic (Claude)</strong> — מודל ה‑AI שמתרגם הודעות, אם בחרת להפעיל תרגום. הם מקבלים רק את הטקסט לתרגום, בלי שמך, מספרך, או פרטים אחרים. <strong>הם לא שומרים את הטקסט ולא מאמנים עליו.</strong></li>
+      <li><strong>Apple / Google</strong> — רק לאימות התחברות.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>למה כדאי להיות רגועים</h2>
+    <ul>
+      <li><strong>אנחנו לא חברת פרסום.</strong> מודל ההכנסה שלנו לא תלוי בנתונים שלך.</li>
+      <li><strong>אנחנו לא חברת AI שאוספת דאטה.</strong> ההודעות שלך לא הופכות לחומר אימון.</li>
+      <li><strong>אין לנו מה להסתיר.</strong> הקוד והתשתית של המערכת בנויים כך שגם אם נרצה — לא נוכל לראות את ההודעות שלך בצורה תפעולית רגילה.</li>
+    </ul>
+  </section>
+
+  <section class="cta">
+    <h2 style="border:none;padding:0;margin-bottom:8px;">רוצים פרטים יותר עמוקים?</h2>
+    <p>המסמך הטכני המלא — עם פירוט על הצפנה, ארכיטקטורה, כללי גישה, ספקי משנה, וזכויות נושא המידע.</p>
+    <a class="btn" href="https://docs.best-it.co.il/ls-duet-security">לקריאת המסמך הטכני המלא</a>
+    <span class="audience">המסמך מיועד למנהלי IT, קציני אבטחת מידע ו‑DPOs.</span>
+  </section>
+
+  <footer>
+    <div class="label">יש שאלה? צרו איתנו קשר</div>
+    <div class="name">Dan Shor / BestIT</div>
+    <a class="email" href="mailto:info@best-it.co.il">info@best-it.co.il</a>
+  </footer>
+
+</main>
+
+</body>
+</html>
